@@ -1,0 +1,137 @@
+/* Centralizar as telas */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 24px 0;
+  background-color: #f2f4f8;
+  font-family: Arial, sans-serif;
+}
+
+/* Card */
+.card {
+  background: white;
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 360px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  margin: 0 12px;
+}
+@media (max-width: 480px) {
+  .app-container {
+    padding: 8px;
+  }
+  .card {
+    padding: 16px 8px;
+    max-width: 98vw;
+    border-radius: 8px;
+  }
+  .btn, .btn-primary, .btn-success, .btn-warning {
+    font-size: 15px;
+    padding: 10px 0;
+  }
+  .input-group input {
+    font-size: 15px;
+    padding: 9px;
+  }
+}
+
+/* Título */
+.card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 22px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #222;
+  font-weight: 500;
+}
+
+.input-group input {
+  color: #222;
+  color: #222;
+  width: 100%;
+  padding: 10px 8px 8px 8px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  outline: none;
+  background: #f8fafd;
+  transition: border 0.2s, box-shadow 0.2s;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  border: 1.5px solid #007bff;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.07);
+}
+
+/* Botões */
+.btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #1e7e34;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 10px;
+  text-decoration: underline;
+  display: block;
+}
+
+.link-btn + .link-btn {
+  margin-top: 18px;
+}
+
