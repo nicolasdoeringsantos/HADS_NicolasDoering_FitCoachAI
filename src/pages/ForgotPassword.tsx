@@ -1,21 +1,19 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
-
-interface ForgotPasswordProps {
-  setPage: (page: string) => void;
-}
 
 type RecoveryMethod = "main_email" | "alt_email" | "phone";
 
-export default function ForgotPassword({ setPage }: ForgotPasswordProps) {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [altEmail, setAltEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [recoveryMethod, setRecoveryMethod] = useState<RecoveryMethod>("main_email");
+  const navigate = useNavigate();
 
-  const handleForgot = (e: React.FormEvent) => {
+  const handleForgot = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert(`Recuperação de senha para: ${email}\nEmail alternativo: ${altEmail}\nTelefone: ${phone}`); // Lógica de recuperação aqui
+    alert(`Recuperação de senha para: ${email}\nEmail alternativo: ${altEmail}\nTelefone: ${phone}`);
   };
 
   return (
@@ -26,7 +24,7 @@ export default function ForgotPassword({ setPage }: ForgotPasswordProps) {
           label="Email principal"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
         />
         {recoveryMethod === "main_email" && (
           <button type="button" className="link-btn" onClick={() => setRecoveryMethod("alt_email")}>
@@ -38,7 +36,7 @@ export default function ForgotPassword({ setPage }: ForgotPasswordProps) {
             label="Email alternativo (opcional)"
             type="email"
             value={altEmail}
-            onChange={(e) => setAltEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAltEmail(e.target.value)}
           />
         )}
         {recoveryMethod !== "phone" && (
@@ -51,12 +49,12 @@ export default function ForgotPassword({ setPage }: ForgotPasswordProps) {
             label="Número cadastrado (opcional)"
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
           />
         )}
         <button type="submit" className="btn btn-primary">Enviar</button>
       </form>
-      <button onClick={() => setPage("login")} className="link-btn">Voltar ao login</button>
+      <button onClick={() => navigate("/")} className="link-btn">Voltar ao login</button>
     </div>
   );
 }

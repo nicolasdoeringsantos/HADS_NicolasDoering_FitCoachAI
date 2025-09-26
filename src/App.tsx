@@ -1,19 +1,23 @@
-import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Exercicios from "./components/Exercicios";
+import ExercicioDetalhe from "./pages/ExercicioDetalhe";
+import MensagemMotivacional from "./pages/MensagemMotivacional";
 import "./App.css";
 
 function App() {
-  const [page, setPage] = useState("login"); // controla tela atual
-
   return (
     <div className="app-container">
-      {page === "login" && <Login setPage={setPage} />}
-      {page === "register" && <Register setPage={setPage} />}
-      {page === "forgot" && <ForgotPassword setPage={setPage} />}
-  {page === "app" && <Exercicios />}
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot" element={<ForgotPassword />} />
+        <Route path="/app" element={<Exercicios />} />
+        <Route path="/exercicio/:id" element={<ExercicioDetalhe />} />
+        <Route path="/motivacional" element={<MensagemMotivacional />} />
+      </Routes>
     </div>
   );
 }

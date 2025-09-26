@@ -1,20 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
 
-interface LoginProps {
-  setPage: (page: string) => void;
-}
-
-
-export default function Login({ setPage }: LoginProps) {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const navigate = useNavigate();
 
   // Simula login localmente, sem backend
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && senha) {
-      setPage("app");
+      navigate("/app");
     } else {
       alert("Preencha email e senha.");
     }
@@ -30,8 +27,8 @@ export default function Login({ setPage }: LoginProps) {
         <button type="submit" className="btn btn-primary">Entrar</button>
       </form>
 
-      <button onClick={() => setPage("forgot")} className="link-btn">Esqueceu a senha?</button>
-      <button onClick={() => setPage("register")} className="link-btn">Criar conta</button>
+      <button onClick={() => navigate("/forgot")} className="link-btn">Esqueceu a senha?</button>
+      <button onClick={() => navigate("/register")} className="link-btn">Criar conta</button>
     </div>
   );
 }

@@ -1,14 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
 
-interface RegisterProps {
-  setPage: (page: string) => void;
-}
-
-export default function Register({ setPage }: RegisterProps) {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmaSenha, setConfirmaSenha] = useState("");
+  const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +23,7 @@ export default function Register({ setPage }: RegisterProps) {
       const data = await res.json();
       if (res.ok) {
         alert("Usuário cadastrado com sucesso! Faça login.");
-        setPage("login");
+        navigate("/");
       } else {
         alert(data.message || "Erro ao cadastrar usuário.");
       }
@@ -43,7 +41,7 @@ export default function Register({ setPage }: RegisterProps) {
         <InputField label="Confirme sua senha" type="password" value={confirmaSenha} onChange={(e) => setConfirmaSenha(e.target.value)} />
         <button type="submit" className="btn btn-primary">Cadastrar</button>
       </form>
-      <button onClick={() => setPage("login")} className="link-btn">Já tem conta? Entrar</button>
+      <button onClick={() => navigate("/")} className="link-btn">Já tem conta? Entrar</button>
     </div>
   );
 }

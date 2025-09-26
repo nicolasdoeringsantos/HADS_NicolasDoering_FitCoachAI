@@ -1,23 +1,27 @@
 
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Simulação de dados de exercícios
 const mockExercicios = [
   {
     id: 1,
     titulo: "Exercício",
-    descricao: "Exemplo de exercício.",
+    descricao: "Exemplo de exercício",
     imagem: "exerc.png"
   }
 ];
 // Componente principal Exercicios
 export default function Exercicios() {
+  // Estado para horário de mensagem motivacional
+  const [horarioMotivacional, setHorarioMotivacional] = useState("08:00");
+  const [sucessoHorario, setSucessoHorario] = useState("");
+  const navigate = useNavigate();
   // Estados globais do componente
   const [perfilPage, setPerfilPage] = useState(false);
   const [configPage, setConfigPage] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [imgPage, setImgPage] = useState<number|null>(null);
   const [loading, setLoading] = useState(false);
 
   // Estados do formulário de perfil
@@ -40,7 +44,6 @@ export default function Exercicios() {
   const [sucessoTreino, setSucessoTreino] = useState("");
   const [erroSenha, setErroSenha] = useState("");
   const [sucessoSenha, setSucessoSenha] = useState("");
-  const [senhaOpen, setSenhaOpen] = useState(true);
 
   // Funções de submit
   const handleSubmitTreino = (e: React.FormEvent) => {
@@ -72,7 +75,6 @@ export default function Exercicios() {
     }
     setSucessoSenha("Senha alterada com sucesso!");
   };
-  // (removida chave solta)
 
   if (perfilPage) {
     return (
@@ -139,13 +141,34 @@ export default function Exercicios() {
   }
 
   if (configPage) {
+    const handleHorarioSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      setSucessoHorario("Horário salvo com sucesso!");
+      setTimeout(() => setSucessoHorario(""), 2000);
+    };
     return (
       <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f2f4f8" }}>
-        <button style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer" }} onClick={() => setConfigPage(false)}>
+        <div style={{ fontSize: 22, color: "#23272f", fontWeight: 600, marginBottom: 18 }}>Configurações</div>
+        <form onSubmit={handleHorarioSubmit} style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 280, maxWidth: 340, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <label style={{ fontWeight: 500, color: "#23272f", fontSize: 16, marginBottom: 6 }}>
+            Horário para receber mensagem motivacional:
+            <input
+              type="time"
+              value={horarioMotivacional}
+              onChange={e => setHorarioMotivacional(e.target.value)}
+              style={{ marginLeft: 10, padding: 6, borderRadius: 6, border: "1px solid #ccc", fontSize: 15 }}
+              required
+            />
+          </label>
+          <button type="submit" style={{ background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "8px 24px", fontWeight: 600, fontSize: 15, cursor: "pointer" }}>Salvar horário</button>
+          {sucessoHorario && <div style={{ color: "#080", fontSize: 14, marginTop: 4 }}>{sucessoHorario}</div>}
+        </form>
+        <button
+          style={{ marginTop: 32, background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "10px 32px", fontWeight: 600, fontSize: 16, cursor: "pointer" }}
+          onClick={() => setConfigPage(false)}
+        >
           Voltar
         </button>
-        <div style={{ fontSize: 22, color: "#23272f", fontWeight: 600, marginBottom: 18 }}>Configurações</div>
-        <div style={{ fontSize: 15, color: "#444" }}>Aqui você pode mostrar as configurações do app.</div>
       </div>
     );
   }
@@ -212,7 +235,7 @@ export default function Exercicios() {
             style={{ padding: "12px 32px", cursor: "pointer", color: "#d00", fontSize: 18 }}
             onClick={() => {
               setMenuOpen(false);
-              // ação de logout simulada
+              navigate("/");
             }}
           >
             Sair
@@ -229,7 +252,7 @@ export default function Exercicios() {
       {/* Mensagem de erro removida pois não está em uso */}
       {/* Mensagem de sucesso removida pois não está em uso */}
 
-      {/* Cards de exercícios simulados */}
+      {/* Cards de exercícios simulados + perfil + mensagem motivacional */}
       <div style={{
         display: "flex",
         flexDirection: "row",
@@ -248,7 +271,7 @@ export default function Exercicios() {
               setLoading(true);
               setTimeout(() => {
                 setLoading(false);
-                setImgPage(exercicio.id);
+                navigate(`/exercicio/${exercicio.id}`);
               }, 400); // Simula carregamento
             }}
             style={{
@@ -311,6 +334,37 @@ export default function Exercicios() {
             Perfil
           </div>
           <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Ver informações do usuário</div>
+        </div>
+        {/* Card de mensagem motivacional */}
+        <div
+          onClick={() => navigate("/motivacional")}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#fff",
+            borderRadius: 16,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
+            padding: 32,
+            width: 180,
+            minWidth: 120,
+            maxWidth: 220,
+            cursor: "pointer",
+            transition: "transform 0.15s, box-shadow 0.15s"
+          }}
+          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
+          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+            alt="Mensagem Motivacional"
+            style={{ width: 80, height: 80, objectFit: "cover", marginBottom: 18, display: "block", borderRadius: 24, border: "2px solid #eee", background: "#f8f8f8" }}
+          />
+          <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
+            Mensagem Motivacional
+          </div>
+          <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Clique para se inspirar!</div>
         </div>
       </div>
       {/* Animações CSS */}
