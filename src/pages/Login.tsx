@@ -7,13 +7,28 @@ export default function Login() {
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
 
-  // Simula login localmente, sem backend
-  const handleLogin = (e: React.FormEvent) => {
+  // Login integrado com backend
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && senha) {
-      navigate("/app");
-    } else {
+    if (!email || !senha) {
       alert("Preencha email e senha.");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password: senha })
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token);
+        navigate("/app");
+      } else {
+        alert(data.message || "Erro ao fazer login.");
+      }
+    } catch (err) {
+      alert("Erro ao conectar ao servidor.");
     }
   };
 
