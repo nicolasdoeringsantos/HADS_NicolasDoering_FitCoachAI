@@ -7,23 +7,20 @@ export default function Login() {
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
 
-  // Login integrado com backend
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !senha) {
-      alert("Preencha email e senha.");
-      return;
-    }
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email, password: senha })
+        body: JSON.stringify({ username: email, password: senha }),
       });
       const data = await res.json();
-      if (res.ok && data.token) {
+      if (res.ok) {
+        // Salva o token no localStorage para usar em futuras requisições
         localStorage.setItem("token", data.token);
-        navigate("/app");
+        alert("Login bem-sucedido!");
+        navigate("/app"); // Navega para a página principal da aplicação
       } else {
         alert(data.message || "Erro ao fazer login.");
       }
@@ -34,16 +31,13 @@ export default function Login() {
 
   return (
     <div className="card">
-      <h2>Login</h2>
+      <h2>Entrar</h2>
       <form onSubmit={handleLogin}>
         <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <InputField label="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
-
         <button type="submit" className="btn btn-primary">Entrar</button>
       </form>
-
-      <button onClick={() => navigate("/forgot")} className="link-btn">Esqueceu a senha?</button>
-      <button onClick={() => navigate("/register")} className="link-btn">Criar conta</button>
+      <button onClick={() => navigate("/register")} className="link-btn">Não tem conta? Cadastre-se</button>
     </div>
   );
 }
