@@ -1,4 +1,10 @@
+
 import React, { useState } from 'react';
+import  {supabase}  from './supabaseClient';
+
+import './Chat.css';
+
+
 
 interface Message {
   sender: 'user' | 'ai';
@@ -23,12 +29,15 @@ const Chat: React.FC<ChatProps> = ({ context }) => {
     setIsLoading(true);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Usuário não autenticado.");
+
       const res = await fetch('http://localhost:5000/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // Adiciona o token de autenticação no header
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ prompt: input, context }),
       });

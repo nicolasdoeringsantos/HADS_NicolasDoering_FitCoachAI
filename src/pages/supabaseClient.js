@@ -1,9 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js'
 
-dotenv.config({ path: '../.env' });
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Supabase URL and Key must be defined in .env file with VITE_ prefix");
+}
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)

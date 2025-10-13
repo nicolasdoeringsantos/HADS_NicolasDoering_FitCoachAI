@@ -1,22 +1,25 @@
-import jwt from 'jsonwebtoken';
+import { supabase } from '../supabaseClient.js';
 
 export const protect = async (req, res, next) => {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
-      // Pega o token do header 'Authorization: Bearer TOKEN'
       token = req.headers.authorization.split(' ')[1];
 
-      // Verifica o token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // Verifica o token com o Supabase
+      const { data: { user }, error } = await supabase.auth.getUser(token);
 
-      // Adiciona o ID do usuário ao objeto da requisição para ser usado nos controllers
-      req.userId = decoded.id;
+      if (error) {
+        return res.status(401).json({ message: 'Não autorizado, token inválido.', error: error.message });
+      }
+
+      // Adiciona o ID do usuário ao objeto da requisição
+      req.userId = user.id;
 
       next();
     } catch (error) {
-      res.status(401).json({ message: 'Não autorizado, token inválido.' });
+      res.status(401).json({ message: 'Não autorizado, token inválido.', error: error.message });
     }
   } else {
     res.status(401).json({ message: 'Não autorizado, token não encontrado.' });
