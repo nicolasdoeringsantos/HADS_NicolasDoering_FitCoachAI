@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
+import { supabase } from "./supabaseClient";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -14,18 +15,18 @@ export default function Register() {
       alert("As senhas não coincidem.");
       return;
     }
+
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email, password: senha })
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: senha,
       });
-      const data = await res.json();
-      if (res.ok) {
+
+      if (error) {
+        alert(error.message || "Erro ao cadastrar usuário.");
+      } else {
         alert("Usuário cadastrado com sucesso! Faça login.");
         navigate("/");
-      } else {
-        alert(data.message || "Erro ao cadastrar usuário.");
       }
     } catch (err) {
       alert("Erro ao conectar ao servidor.");
@@ -36,7 +37,7 @@ export default function Register() {
     <div className="card">
       <h2>Cadastro</h2>
       <form onSubmit={handleRegister}>
-        <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
         <InputField label="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
         <InputField label="Confirme sua senha" type="password" value={confirmaSenha} onChange={(e) => setConfirmaSenha(e.target.value)} />
         <button type="submit" className="btn btn-primary">Cadastrar</button>

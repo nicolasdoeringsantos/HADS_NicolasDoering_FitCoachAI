@@ -1,7 +1,8 @@
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../pages/supabaseClient";
 
 // Simulação de dados de exercícios
 const mockExercicios = [
@@ -46,7 +47,7 @@ export default function Exercicios() {
   const [sucessoSenha, setSucessoSenha] = useState("");
 
   // Funções de submit
-  const handleSubmitTreino = (e: React.FormEvent) => {
+  const handleSubmitTreino = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroTreino("");
     setSucessoTreino("");
@@ -54,8 +55,44 @@ export default function Exercicios() {
       setErroTreino("Preencha todos os campos obrigatórios.");
       return;
     }
-    setSucessoTreino("Dados salvos! Pronto para criar seu treino.");
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não encontrado");
+
+      const { error } = await supabase
+        .from('users')
+        .update({
+          nome,
+          apelido,
+          idade: parseInt(idade),
+          sexo,
+          altura: parseInt(altura),
+          peso: parseInt(peso),
+          nivel,
+          experiencia,
+          objetivo,
+          restricao,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setSucessoTreino("Dados salvos! Pronto para criar seu treino.");
+    } catch (error: any) {
+      setErroTreino(error.message || "Erro ao salvar os dados.");
+    }
   };
+
+  // Carregar dados do usuário ao abrir a página de perfil
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      // Aqui você pode buscar os dados da tabela 'users' e preencher os campos do formulário
+      // Ex: const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
+    };
+    if (perfilPage) fetchUserData();
+  }, [perfilPage]);
 
   const handleSubmitSenha = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +111,11 @@ export default function Exercicios() {
       return;
     }
     setSucessoSenha("Senha alterada com sucesso!");
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
   };
 
   if (perfilPage) {
@@ -234,8 +276,7 @@ export default function Exercicios() {
           <div
             style={{ padding: "12px 32px", cursor: "pointer", color: "#d00", fontSize: 18 }}
             onClick={() => {
-              setMenuOpen(false);
-              navigate("/");
+              handleLogout();
             }}
           >
             Sair

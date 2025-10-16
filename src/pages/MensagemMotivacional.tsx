@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "./supabaseClient";
 
 export default function MensagemMotivacional() {
   const [message, setMessage] = useState("Carregando sua inspiração do dia...");
@@ -8,8 +9,9 @@ export default function MensagemMotivacional() {
 
   useEffect(() => {
     const fetchMessage = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
         navigate("/"); // Redireciona para o login se não houver token
         return;
       }
@@ -17,7 +19,7 @@ export default function MensagemMotivacional() {
       try {
         const res = await fetch("http://localhost:5000/api/ai/daily-message", {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`,
           },
         });
 
