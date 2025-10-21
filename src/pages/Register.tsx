@@ -25,7 +25,7 @@ export default function Register() {
       if (error) {
         alert(error.message || "Erro ao cadastrar usuário.");
       } else {
-        alert("Usuário cadastrado com sucesso! Faça login.");
+        alert("Cadastro realizado! Verifique seu e-mail para confirmar sua conta antes de fazer o login.");
         navigate("/");
       }
     } catch (err) {

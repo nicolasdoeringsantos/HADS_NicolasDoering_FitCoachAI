@@ -1,8 +1,9 @@
 // ...existing code...
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function ExercicioDetalhe() {
   const { id } = useParams();
+  const navigate = useNavigate();
   // Dados temporários simulados
   const exercicio = {
     titulo: "Agachamento Livre",
@@ -21,9 +22,9 @@ export default function ExercicioDetalhe() {
   };
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f2f4f8" }}>
-      <Link to="/app" style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer", textDecoration: "none" }}>
+      <button onClick={() => navigate(-1)} style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer", textDecoration: "none" }}>
         Voltar
-      </Link>
+      </button>
       <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 320, maxWidth: 400, width: "100%", marginBottom: 24 }}>
         <h2 style={{ textAlign: "center", marginBottom: 12 }}>{exercicio.titulo}</h2>
         <img src={exercicio.imagem} alt={exercicio.titulo} style={{ width: 120, height: 120, objectFit: "contain", display: "block", margin: "0 auto 16px auto", borderRadius: 18, border: "2px solid #eee", background: "#f8f8f8" }} />

@@ -14,7 +14,7 @@ export const generateChatResponse = async (req, res) => {
   try {
     // 1. Buscar os dados do usuário no banco de dados
     const { data: userData, error: userError } = await supabase
-      .from('users')
+      .from('Users_data')
       .select('username, nome, idade, sexo, altura, peso, nivel, experiencia, objetivo, restricao')
       .eq('id', userId)
       .single();
@@ -70,7 +70,7 @@ export const getDailyMessage = async (req, res) => {
 
     // 2. Se não existe, busca os dados do usuário para personalizar a mensagem
     const { data: userData, error: userError } = await supabase
-      .from('users')
+      .from('Users_data')
       .select('nome, objetivo')
       .eq('id', userId)
       .single();

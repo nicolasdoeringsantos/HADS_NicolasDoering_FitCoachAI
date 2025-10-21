@@ -19,9 +19,13 @@ export default function Login() {
 
       if (error) {
         alert(error.message || "Erro ao fazer login.");
+      } else if (data.user && data.user.email_confirmed_at === null) {
+        // Se o usuário existe mas o e-mail não foi confirmado
+        await supabase.auth.signOut(); // Desloga o usuário
+        alert("Você precisa confirmar seu e-mail antes de fazer o login. Verifique sua caixa de entrada.");
       } else {
         // O cliente Supabase gerencia a sessão automaticamente no localStorage.
-        alert("Login bem-sucedido!");
+        // Login bem-sucedido e e-mail confirmado
         navigate("/app"); // Navega para a página principal da aplicação
       }
     } catch (err) {

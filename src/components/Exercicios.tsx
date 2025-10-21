@@ -61,22 +61,25 @@ export default function Exercicios() {
       if (!user) throw new Error("Usuário não encontrado");
 
       const { error } = await supabase
-        .from('users')
-        .update({
+        .from('Users_data')
+        .upsert({
+          id: user.id, // Garante que o ID do usuário seja inserido ou usado para a correspondência
           nome,
           apelido,
-          idade: parseInt(idade),
+          idade: parseInt(idade) || null,
           sexo,
-          altura: parseInt(altura),
-          peso: parseInt(peso),
+          altura: parseInt(altura) || null,
+          peso: parseFloat(peso) || null,
           nivel,
           experiencia,
           objetivo,
           restricao,
-        })
-        .eq('id', user.id);
+          updated_at: new Date().toISOString(),
+        });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       setSucessoTreino("Dados salvos! Pronto para criar seu treino.");
     } catch (error: any) {
@@ -87,9 +90,36 @@ export default function Exercicios() {
   // Carregar dados do usuário ao abrir a página de perfil
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      // Aqui você pode buscar os dados da tabela 'users' e preencher os campos do formulário
-      // Ex: const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
+      setLoading(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado.");
+
+        const { data, error } = await supabase
+          .from('Users_data')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') throw error; // Ignora erro se o perfil ainda não existe
+
+        if (data) {
+          setNome(data.nome || "");
+          setApelido(data.apelido || "");
+          setIdade(data.idade?.toString() || "");
+          setSexo(data.sexo || "");
+          setAltura(data.altura?.toString() || "");
+          setPeso(data.peso?.toString() || "");
+          setNivel(data.nivel || "");
+          setExperiencia(data.experiencia || "");
+          setObjetivo(data.objetivo || "");
+          setRestricao(data.restricao || "");
+        }
+      } catch (error: any) {
+        setErroTreino("Erro ao carregar dados do perfil: " + error.message);
+      } finally {
+        setLoading(false);
+      }
     };
     if (perfilPage) fetchUserData();
   }, [perfilPage]);
@@ -121,7 +151,10 @@ export default function Exercicios() {
   if (perfilPage) {
     return (
       <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f2f4f8" }}>
-        <button style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer" }} onClick={() => setPerfilPage(false)}>
+        <button 
+          style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer" }} 
+          onClick={() => navigate(-1)}
+        >
           Voltar
         </button>
         {/* Card de dados do treino */}
@@ -312,7 +345,7 @@ export default function Exercicios() {
               setLoading(true);
               setTimeout(() => {
                 setLoading(false);
-                navigate(`/exercicio/${exercicio.id}`);
+                navigate(`/chat`);
               }, 400); // Simula carregamento
             }}
             style={{
@@ -340,9 +373,9 @@ export default function Exercicios() {
               style={{ width: 80, height: 80, objectFit: "contain", marginBottom: 18, display: "block", borderRadius: 24, border: "2px solid #eee", background: "#f8f8f8" }}
             />
             <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
-              {exercicio.titulo}
+              Conversar com IA
             </div>
-            <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>{exercicio.descricao}</div>
+            <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Tire suas dúvidas e peça treinos</div>
           </div>
         ))}
         {/* Card de perfil */}
