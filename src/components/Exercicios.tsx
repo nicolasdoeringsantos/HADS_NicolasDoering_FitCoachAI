@@ -74,7 +74,6 @@ export default function Exercicios() {
           experiencia,
           objetivo,
           restricao,
-          updated_at: new Date().toISOString(),
         });
 
       if (error) {
@@ -124,7 +123,7 @@ export default function Exercicios() {
     if (perfilPage) fetchUserData();
   }, [perfilPage]);
 
-  const handleSubmitSenha = (e: React.FormEvent) => {
+  const handleSubmitSenha = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroSenha("");
     setSucessoSenha("");
@@ -140,7 +139,21 @@ export default function Exercicios() {
       setErroSenha("A nova senha deve ter pelo menos 6 caracteres.");
       return;
     }
-    setSucessoSenha("Senha alterada com sucesso!");
+    // TODO: Adicionar validação da senha atual se necessário, o que exigiria um backend seguro.
+    // A API do Supabase auth.updateUser não verifica a senha antiga por segurança.
+    try {
+      const { error } = await supabase.auth.updateUser({ password: novaSenha });
+      if (error) {
+        throw error;
+      }
+      setSucessoSenha("Senha alterada com sucesso!");
+      // Limpar campos após o sucesso
+      setSenhaAtual("");
+      setNovaSenha("");
+      setConfirmarSenha("");
+    } catch (error: any) {
+      setErroSenha(error.message || "Erro ao alterar a senha.");
+    }
   };
 
   const handleLogout = async () => {
@@ -153,7 +166,7 @@ export default function Exercicios() {
       <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f2f4f8" }}>
         <button 
           style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer" }} 
-          onClick={() => navigate(-1)}
+          onClick={() => setPerfilPage(false)}
         >
           Voltar
         </button>
@@ -323,9 +336,6 @@ export default function Exercicios() {
           <span style={{ background: "#fff", color: "#23272f", padding: "8px 24px", borderRadius: 8, boxShadow: "0 2px 8px #bbb", fontWeight: 500 }}>Carregando...</span>
         </div>
       )}
-      {/* Mensagem de erro removida pois não está em uso */}
-      {/* Mensagem de sucesso removida pois não está em uso */}
-
       {/* Cards de exercícios simulados + perfil + mensagem motivacional */}
       <div style={{
         display: "flex",
@@ -378,6 +388,44 @@ export default function Exercicios() {
             <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Tire suas dúvidas e peça treinos</div>
           </div>
         ))}
+        {/* Card de Alimentação */}
+        <div
+          onClick={() => {
+            setLoading(true);
+            setTimeout(() => {
+              setLoading(false);
+              navigate(`/chat-alimentacao`); // Nova rota para o chat de alimentação
+            }, 400);
+          }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            background: "#fff",
+            borderRadius: 32,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
+            padding: 32,
+            width: 180,
+            minWidth: 120,
+            maxWidth: 220,
+            transition: "transform 0.15s, box-shadow 0.15s",
+            marginBottom: 12
+          }}
+          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
+          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          <img
+            src="/alimentacao.png" // Adicione uma imagem `alimentacao.png` na pasta `public`
+            alt="Alimentação"
+            style={{ width: 80, height: 80, objectFit: "contain", marginBottom: 18, display: "block", borderRadius: 24, border: "2px solid #eee", background: "#f8f8f8" }}
+          />
+          <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
+            Chat de Nutrição
+          </div>
+          <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Receba dicas e planos alimentares</div>
+        </div>
         {/* Card de perfil */}
         <div
           onClick={() => setPerfilPage(true)}
