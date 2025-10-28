@@ -42,7 +42,7 @@ export default function Register() {
         <InputField label="Confirme sua senha" type="password" value={confirmaSenha} onChange={(e) => setConfirmaSenha(e.target.value)} />
         <button type="submit" className="btn btn-primary">Cadastrar</button>
       </form>
-      <button onClick={() => navigate("/")} className="link-btn">Já tem conta? Entrar</button>
+      <button onClick={() => navigate("/login")} className="link-btn">Já tem conta? Entrar</button>
     </div>
   );
 }

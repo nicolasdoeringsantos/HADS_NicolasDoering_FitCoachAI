@@ -7,6 +7,7 @@ import ExercicioDetalhe from "./pages/ExercicioDetalhe";
 import MensagemMotivacional from "./pages/MensagemMotivacional";
 import ChatPage from "./pages/ChatPage"; // 1. Importe o componente de ChatPage
 import AlimentacaoChatPage from "./components/AlimentacaoChatPage";
+import WorkoutHistory from "./pages/WorkoutHistory"; // Importe a nova página
 import "./App.css";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         {/* 2. Adicione a rota para a página de chat */}
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/chat-alimentacao" element={<AlimentacaoChatPage />} />
+        <Route path="/historico-treinos" element={<WorkoutHistory />} />
       </Routes>
     </div>
   );

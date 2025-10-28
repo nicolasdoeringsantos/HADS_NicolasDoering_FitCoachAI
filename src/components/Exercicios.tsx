@@ -24,6 +24,7 @@ export default function Exercicios() {
   const [configPage, setConfigPage] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Estados do formulário de perfil
   const [nome, setNome] = useState("");
@@ -36,6 +37,12 @@ export default function Exercicios() {
   const [experiencia, setExperiencia] = useState("");
   const [objetivo, setObjetivo] = useState("");
   const [restricao, setRestricao] = useState("");
+  // Estados do formulário de dieta
+  const [alergias, setAlergias] = useState("");
+  const [intolerancias, setIntolerancias] = useState("");
+  const [comidasNaoGosta, setComidasNaoGosta] = useState("");
+  const [tipoDieta, setTipoDieta] = useState("");
+  const [refeicoesPorDia, setRefeicoesPorDia] = useState("");
 
   // Estados do formulário de senha
   const [senhaAtual, setSenhaAtual] = useState("");
@@ -45,13 +52,15 @@ export default function Exercicios() {
   const [sucessoTreino, setSucessoTreino] = useState("");
   const [erroSenha, setErroSenha] = useState("");
   const [sucessoSenha, setSucessoSenha] = useState("");
+  const [erroDieta, setErroDieta] = useState("");
+  const [sucessoDieta, setSucessoDieta] = useState("");
 
   // Funções de submit
-  const handleSubmitTreino = async (e: React.FormEvent) => {
+  const handleSubmitPerfil = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroTreino("");
     setSucessoTreino("");
-    if (!nome || !idade || !sexo || !altura || !peso || !nivel || !experiencia) {
+    if (!nome || !idade || !sexo || !altura || !peso) {
       setErroTreino("Preencha todos os campos obrigatórios.");
       return;
     }
@@ -74,6 +83,11 @@ export default function Exercicios() {
           experiencia,
           objetivo,
           restricao,
+          alergias,
+          intolerancias,
+          comidas_que_nao_gosta: comidasNaoGosta,
+          tipo_dieta_preferida: tipoDieta,
+          refeicoes_por_dia: parseInt(refeicoesPorDia) || null,
         });
 
       if (error) {
@@ -81,8 +95,10 @@ export default function Exercicios() {
       }
 
       setSucessoTreino("Dados salvos! Pronto para criar seu treino.");
+      setSucessoDieta("Dados de dieta salvos com sucesso!");
     } catch (error: any) {
       setErroTreino(error.message || "Erro ao salvar os dados.");
+      setErroDieta(error.message || "Erro ao salvar os dados da dieta.");
     }
   };
 
@@ -113,6 +129,11 @@ export default function Exercicios() {
           setExperiencia(data.experiencia || "");
           setObjetivo(data.objetivo || "");
           setRestricao(data.restricao || "");
+          setAlergias(data.alergias || "");
+          setIntolerancias(data.intolerancias || "");
+          setComidasNaoGosta(data.comidas_que_nao_gosta || "");
+          setTipoDieta(data.tipo_dieta_preferida || "");
+          setRefeicoesPorDia(data.refeicoes_por_dia?.toString() || "");
         }
       } catch (error: any) {
         setErroTreino("Erro ao carregar dados do perfil: " + error.message);
@@ -122,6 +143,21 @@ export default function Exercicios() {
     };
     if (perfilPage) fetchUserData();
   }, [perfilPage]);
+
+  // Efeito para carregar e aplicar o modo noturno
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(savedMode);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', String(isDarkMode));
+    if (isDarkMode) {
+      document.body.style.backgroundColor = '#1a1a1a';
+    } else {
+      document.body.style.backgroundColor = '#f2f4f8';
+    }
+  }, [isDarkMode]);
 
   const handleSubmitSenha = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,9 +197,22 @@ export default function Exercicios() {
     navigate("/");
   };
 
+  const colors = {
+    bg: isDarkMode ? '#1a1a1a' : '#f2f4f8',
+    cardBg: isDarkMode ? '#2c2c2c' : '#fff',
+    text: isDarkMode ? '#e5e5e5' : '#23272f',
+    subtext: isDarkMode ? '#a0a0a0' : '#666',
+    border: isDarkMode ? '#444' : '#ccc',
+    inputBg: isDarkMode ? '#333' : '#fff',
+    inputText: isDarkMode ? '#fff' : '#000',
+    headerBg: '#23272f', // Mantém o header escuro em ambos os modos
+    headerText: '#fff',
+    primary: '#22c55e',
+  };
+
   if (perfilPage) {
-    return (
-      <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f2f4f8" }}>
+    return ( // O código da página de perfil permanece o mesmo, mas é bom notar que o fundo aqui também mudará.
+      <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: colors.bg, color: colors.text }}>
         <button 
           style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer" }} 
           onClick={() => setPerfilPage(false)}
@@ -171,12 +220,12 @@ export default function Exercicios() {
           Voltar
         </button>
         {/* Card de dados do treino */}
-        <div style={{ background: "#fff", borderRadius: 18, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 320, maxWidth: 400, width: "100%", marginBottom: 32 }}>
+        <div style={{ background: colors.cardBg, borderRadius: 18, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 320, maxWidth: 400, width: "100%", marginBottom: 32 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", userSelect: "none" }}>
             <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Perfil" style={{ width: 90, height: 90, objectFit: "cover", borderRadius: "50%", border: "2px solid #23272f", marginBottom: 8 }} />
             <div style={{ fontSize: 20, color: "#23272f", fontWeight: 600, marginBottom: 2 }}>Dados para criar seu treino</div>
           </div>
-          <form onSubmit={handleSubmitTreino} style={{ display: 'flex', flexDirection: "column", gap: 14, marginTop: 16 }}>
+          <form onSubmit={handleSubmitPerfil} style={{ display: 'flex', flexDirection: "column", gap: 14, marginTop: 16 }}>
             <input type="text" placeholder="Nome completo" value={nome} onChange={e => setNome(e.target.value)} required style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
             <input type="text" placeholder="Apelido (opcional)" value={apelido} onChange={e => setApelido(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
             <input type="number" placeholder="Idade" value={idade} onChange={e => setIdade(e.target.value)} required style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
@@ -205,6 +254,21 @@ export default function Exercicios() {
             <input type="text" placeholder="Restrições de saúde (opcional)" value={restricao} onChange={e => setRestricao(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
             <div style={{ fontWeight: 500, color: '#23272f', marginBottom: 2, marginTop: 8 }}>Preferências (opcional)</div>
             <textarea placeholder="Observações, preferências de treino, horários, etc." style={{ padding: 8, borderRadius: 8, border: '1px solid #ccc', minHeight: 40 }} />
+            
+            {/* Seção de Dieta */}
+            <div style={{ fontSize: 20, color: "#23272f", fontWeight: 600, marginTop: 24, marginBottom: 8, textAlign: 'center' }}>Dados para criar sua dieta</div>
+            <input type="text" placeholder="Alergias alimentares (ex: amendoim, frutos do mar)" value={alergias} onChange={e => setAlergias(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
+            <input type="text" placeholder="Intolerâncias (ex: lactose, glúten)" value={intolerancias} onChange={e => setIntolerancias(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
+            <input type="text" placeholder="Comidas que não gosta" value={comidasNaoGosta} onChange={e => setComidasNaoGosta(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
+            <input type="text" placeholder="Tipo de dieta preferida (ex: vegetariana)" value={tipoDieta} onChange={e => setTipoDieta(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
+            <select value={refeicoesPorDia} onChange={e => setRefeicoesPorDia(e.target.value)} style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc" }}>
+              <option value="">Nº de refeições por dia</option>
+              <option value="3">3 refeições</option>
+              <option value="4">4 refeições</option>
+              <option value="5">5 refeições</option>
+              <option value="6">6 ou mais refeições</option>
+            </select>
+
             {erroTreino && <div style={{ color: "#d00", fontSize: 14, marginTop: 4 }}>{erroTreino}</div>}
             {sucessoTreino && <div style={{ color: "#080", fontSize: 14, marginTop: 4 }}>{sucessoTreino}</div>}
             <button type="submit" style={{ background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "10px 0", fontWeight: 600, fontSize: 16, marginTop: 8, cursor: "pointer" }}>Salvar</button>
@@ -229,14 +293,14 @@ export default function Exercicios() {
   }
 
   if (configPage) {
-    const handleHorarioSubmit = (e: React.FormEvent) => {
+    const handleHorarioSubmit = (e: React.FormEvent) => { // O código da página de configurações também permanece o mesmo.
       e.preventDefault();
       setSucessoHorario("Horário salvo com sucesso!");
       setTimeout(() => setSucessoHorario(""), 2000);
     };
     return (
-      <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f2f4f8" }}>
-        <div style={{ fontSize: 22, color: "#23272f", fontWeight: 600, marginBottom: 18 }}>Configurações</div>
+      <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: colors.bg, color: colors.text }}>
+        <div style={{ fontSize: 22, color: colors.text, fontWeight: 600, marginBottom: 18 }}>Configurações</div>
         <form onSubmit={handleHorarioSubmit} style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 280, maxWidth: 340, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
           <label style={{ fontWeight: 500, color: "#23272f", fontSize: 16, marginBottom: 6 }}>
             Horário para receber mensagem motivacional:
@@ -251,6 +315,16 @@ export default function Exercicios() {
           <button type="submit" style={{ background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "8px 24px", fontWeight: 600, fontSize: 15, cursor: "pointer" }}>Salvar horário</button>
           {sucessoHorario && <div style={{ color: "#080", fontSize: 14, marginTop: 4 }}>{sucessoHorario}</div>}
         </form>
+        {/* Configuração de Modo Noturno */}
+        <form style={{ background: colors.cardBg, borderRadius: 16, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 280, maxWidth: 340, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginTop: 24 }}>
+          <label style={{ fontWeight: 500, color: colors.text, fontSize: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+            Modo Noturno
+            <label style={{ display: 'inline-flex', position: 'relative', cursor: 'pointer' }}>
+              <input type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} style={{ opacity: 0, width: 0, height: 0 }} />
+              <span style={{ width: 42, height: 22, borderRadius: 11, background: isDarkMode ? colors.primary : '#ccc', display: 'block', position: 'relative', transition: 'background 0.2s' }}><span style={{ content: '""', position: 'absolute', top: 2, left: 2, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'transform 0.2s', transform: isDarkMode ? 'translateX(20px)' : 'translateX(0)' }}></span></span>
+            </label>
+          </label>
+        </form>
         <button
           style={{ marginTop: 32, background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "10px 32px", fontWeight: 600, fontSize: 16, cursor: "pointer" }}
           onClick={() => setConfigPage(false)}
@@ -262,7 +336,16 @@ export default function Exercicios() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", width: "100vw", background: "#f2f4f8", position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start" }}>
+    <div style={{ 
+      minHeight: "100vh", 
+      width: "100vw", 
+      background: '#4c1d1d', // Fundo vermelho escuro e opaco
+      color: '#fff',
+      position: "relative", 
+      display: "flex", 
+      flexDirection: "column", 
+      alignItems: "center", 
+      justifyContent: "flex-start" }}>
       {/* Menu Hambúrguer */}
       <header
         style={{
@@ -271,7 +354,7 @@ export default function Exercicios() {
           left: 0,
           width: "100vw",
           height: 60,
-          background: "#23272f",
+          background: "rgba(0,0,0,0.2)", // Header semitransparente
           color: "#fff",
           display: "flex",
           alignItems: "center",
@@ -285,7 +368,7 @@ export default function Exercicios() {
         <button style={{ background: 'transparent', border: 0, color: '#fff', fontSize: 28, cursor: 'pointer', padding: 0, marginRight: 8 }} onClick={() => setMenuOpen((v) => !v)} aria-label="Menu">
           ☰
         </button>
-        <span style={{ fontWeight: 500, fontSize: 20 }}>Bem-vindo, Usuário</span>
+        <span style={{ fontWeight: 600, fontSize: 20, color: '#FFD600' }}>FitCoachAI</span>
         <div style={{ width: 32 }} />
       </header>
       {menuOpen && (
@@ -294,7 +377,7 @@ export default function Exercicios() {
           top: 60,
           left: 0,
           width: "100vw",
-          background: "#23272f",
+          background: "rgba(0,0,0,0.4)",
           color: "#fff",
           zIndex: 200,
           boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
@@ -338,155 +421,78 @@ export default function Exercicios() {
       )}
       {/* Cards de exercícios simulados + perfil + mensagem motivacional */}
       <div style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        gap: 24,
-        marginTop: 100,
-        width: "100%",
-        flexWrap: "wrap",
-        animation: "fadeIn 0.5s"
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          minHeight: 'calc(100vh - 60px)',
+          marginTop: '60px',
+          padding: '2rem',
+          gap: '4rem',
+          flexWrap: 'wrap',
+          boxSizing: 'border-box'
       }}>
-        {mockExercicios.map(exercicio => (
-          <div
-            key={exercicio.id}
-            onClick={() => {
-              setLoading(true);
-              setTimeout(() => {
-                setLoading(false);
-                navigate(`/chat`);
-              }, 400); // Simula carregamento
-            }}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              background: "#fff",
-              borderRadius: 32,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-              padding: 32,
-              width: 180,
-              minWidth: 120,
-              maxWidth: 220,
-              transition: "transform 0.15s, box-shadow 0.15s",
-              marginBottom: 12
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            <img
-              src={exercicio.imagem}
-              alt={exercicio.titulo}
-              style={{ width: 80, height: 80, objectFit: "contain", marginBottom: 18, display: "block", borderRadius: 24, border: "2px solid #eee", background: "#f8f8f8" }}
-            />
-            <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
-              Conversar com IA
+        {/* Seção de Descrição */}
+        <div style={{ maxWidth: '450px', textAlign: 'left', animation: "fadeIn 0.8s" }}>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', color: '#FFD600', textShadow: '1px 1px 4px rgba(0,0,0,0.5)', margin: '0 0 1rem 0' }}>Sua Jornada Começa Agora</h1>
+          <p style={{ fontSize: '1.1rem', lineHeight: 1.6, color: '#f0f0f0' }}>
+            Bem-vindo ao seu painel de controle. Aqui você tem acesso direto aos nossos especialistas de IA para criar seus treinos e dietas. Use as ferramentas ao lado para começar.
+          </p>
+        </div>
+
+        {/* Seção de Ferramentas */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: "fadeIn 0.8s 0.2s backwards" }}>
+            {/* Card de Treino */}
+            <div
+              onClick={() => navigate(`/chat`)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '16px', cursor: 'pointer',
+                transition: 'transform 0.2s ease, background 0.2s ease', minWidth: '350px'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.background = "rgba(0,0,0,0.3)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.background = "rgba(0,0,0,0.2)"; }}
+            >
+              <span style={{ fontSize: '2.5rem' }}>🏋️</span>
+              <div>
+                <h3 style={{ margin: 0, color: '#FFD600' }}>Personal Trainer AI</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Crie e ajuste seus treinos.</p>
+              </div>
             </div>
-            <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Tire suas dúvidas e peça treinos</div>
-          </div>
-        ))}
-        {/* Card de Alimentação */}
-        <div
-          onClick={() => {
-            setLoading(true);
-            setTimeout(() => {
-              setLoading(false);
-              navigate(`/chat-alimentacao`); // Nova rota para o chat de alimentação
-            }, 400);
-          }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            background: "#fff",
-            borderRadius: 32,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-            padding: 32,
-            width: 180,
-            minWidth: 120,
-            maxWidth: 220,
-            transition: "transform 0.15s, box-shadow 0.15s",
-            marginBottom: 12
-          }}
-          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          <img
-            src="/alimentacao.png" // Adicione uma imagem `alimentacao.png` na pasta `public`
-            alt="Alimentação"
-            style={{ width: 80, height: 80, objectFit: "contain", marginBottom: 18, display: "block", borderRadius: 24, border: "2px solid #eee", background: "#f8f8f8" }}
-          />
-          <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
-            Chat de Nutrição
-          </div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Receba dicas e planos alimentares</div>
-        </div>
-        {/* Card de perfil */}
-        <div
-          onClick={() => setPerfilPage(true)}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#fff",
-            borderRadius: 16,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-            padding: 32,
-            width: 180,
-            minWidth: 120,
-            maxWidth: 220,
-            cursor: "pointer",
-            transition: "transform 0.15s, box-shadow 0.15s"
-          }}
-          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          <img
-            src="https://www.w3schools.com/howto/img_avatar.png"
-            alt="Perfil"
-            style={{ width: 80, height: 80, objectFit: "cover", marginBottom: 18, display: "block", borderRadius: "50%", border: "2px solid #eee" }}
-          />
-          <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
-            Perfil
-          </div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Ver informações do usuário</div>
-        </div>
-        {/* Card de mensagem motivacional */}
-        <div
-          onClick={() => navigate("/motivacional")}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#fff",
-            borderRadius: 16,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-            padding: 32,
-            width: 180,
-            minWidth: 120,
-            maxWidth: 220,
-            cursor: "pointer",
-            transition: "transform 0.15s, box-shadow 0.15s"
-          }}
-          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          <img
-            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
-            alt="Mensagem Motivacional"
-            style={{ width: 80, height: 80, objectFit: "cover", marginBottom: 18, display: "block", borderRadius: 24, border: "2px solid #eee", background: "#f8f8f8" }}
-          />
-          <div style={{ fontWeight: 600, fontSize: 20, color: "#23272f", textAlign: "center" }}>
-            Mensagem Motivacional
-          </div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 6, textAlign: "center" }}>Clique para se inspirar!</div>
+
+            {/* Card de Nutrição */}
+            <div
+              onClick={() => navigate(`/chat-alimentacao`)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '16px', cursor: 'pointer',
+                transition: 'transform 0.2s ease, background 0.2s ease', minWidth: '350px'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.background = "rgba(0,0,0,0.3)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.background = "rgba(0,0,0,0.2)"; }}
+            >
+              <span style={{ fontSize: '2.5rem' }}>🍎</span>
+              <div>
+                <h3 style={{ margin: 0, color: '#FFD600' }}>Nutricionista AI</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Receba dietas e dicas de nutrição.</p>
+              </div>
+            </div>
+
+            {/* Card de Perfil */}
+            <div
+              onClick={() => setPerfilPage(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '16px', cursor: 'pointer',
+                transition: 'transform 0.2s ease, background 0.2s ease', minWidth: '350px'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.background = "rgba(0,0,0,0.3)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.background = "rgba(0,0,0,0.2)"; }}
+            >
+              <span style={{ fontSize: '2.5rem' }}>👤</span>
+              <div>
+                <h3 style={{ margin: 0, color: '#FFD600' }}>Meu Perfil</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Ajuste seus dados e preferências.</p>
+              </div>
+            </div>
         </div>
       </div>
       {/* Animações CSS */}
