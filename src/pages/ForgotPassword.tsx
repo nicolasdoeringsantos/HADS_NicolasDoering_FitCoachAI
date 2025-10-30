@@ -12,7 +12,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`, // Crie esta rota para o usuário definir a nova senha
+        redirectTo: `${window.location.origin}/update-password`,
       });
 
       if (error) {
@@ -38,7 +38,7 @@ export default function ForgotPassword() {
         />
         <button type="submit" className="btn btn-primary">Enviar</button>
       </form>
-      <button onClick={() => navigate("/")} className="link-btn">Voltar ao login</button>
+      <button onClick={() => navigate("/login")} className="link-btn">Voltar ao login</button>
     </div>
   );
 }

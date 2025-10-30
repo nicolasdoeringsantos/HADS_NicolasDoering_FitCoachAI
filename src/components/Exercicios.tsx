@@ -493,6 +493,23 @@ export default function Exercicios() {
                 <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Ajuste seus dados e preferências.</p>
               </div>
             </div>
+
+            {/* Card de Mensagem Diária */}
+            <div
+              onClick={() => navigate(`/motivacional`)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '16px', cursor: 'pointer',
+                transition: 'transform 0.2s ease, background 0.2s ease', minWidth: '350px'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.background = "rgba(0,0,0,0.3)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.background = "rgba(0,0,0,0.2)"; }}
+            >
+              <span style={{ fontSize: '2.5rem' }}>✨</span>
+              <div>
+                <h3 style={{ margin: 0, color: '#FFD600' }}>Mensagem do Dia</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Sua dose diária de inspiração.</p>
+              </div>
+            </div>
         </div>
       </div>
       {/* Animações CSS */}

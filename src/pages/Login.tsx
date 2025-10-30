@@ -41,7 +41,15 @@ export default function Login() {
         <InputField label="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
         <button type="submit" className="btn btn-primary">Entrar</button>
       </form>
-      <button onClick={() => navigate("/register")} className="link-btn">Não tem conta? Cadastre-se</button>
+      {/* Container para limpar o float dos botões abaixo */}
+      <div style={{ width: '100%', marginTop: '1rem', overflow: 'hidden' }}>
+        <button onClick={() => navigate("/register")} className="link-btn" style={{ float: 'left' }}>
+          Não tem conta? Cadastre-se
+        </button>
+        <button onClick={() => navigate("/forgot")} className="link-btn" style={{ float: 'right', position: 'relative', top: '-8px' }}>
+          Esqueceu sua senha?
+        </button>
+      </div>
     </div>
   );
 }
