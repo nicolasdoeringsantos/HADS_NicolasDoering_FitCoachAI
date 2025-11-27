@@ -107,11 +107,9 @@ const ChatComponent: React.FC<ChatProps> = ({ chatType, title, initialMessage, c
           'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-  planName: planName.trim(),
-  planContent,
-  planType: chatType,
-  role:"ai",
-  table: chatType === 'dieta' ? 'diet_chat_messages' : 'workout_chat_messages',
+  plan_type: chatType,   // <-- nome correto
+  message: planContent,  // <-- a function salva "message"
+  role: "ai"              // <-- a function exige "role"
 }),
       });
 
