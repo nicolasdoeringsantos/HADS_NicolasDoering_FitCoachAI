@@ -108,7 +108,7 @@ export default function WorkoutDetail() {
         <p>Treino não encontrado.</p>
       )}
 
-      <button onClick={() => navigate(-1)} style={{ marginTop: '2rem', backgroundColor: '#FFD600', color: '#B71C1C', border: 'none', borderRadius: '50px', padding: '0.75rem 2rem', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>
+      <button onClick={() => navigate(-1)} style={{ marginTop: '2rem', background: '#FFD600', color: '#B71C1C', border: 'none', borderRadius: '50px', padding: '0.75rem 2rem', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 14px 0 rgba(0,0,0,0.2)' }}>
         Voltar
       </button>
     </div>

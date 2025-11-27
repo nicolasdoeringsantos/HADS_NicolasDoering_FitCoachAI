@@ -162,6 +162,36 @@ const ChatComponent: React.FC<ChatProps> = ({
     }
   }, [input, messages, chatType, context]);
 
+  const handleSavePlan = async (planContent: string) => {
+    const planName = prompt(`Dê um nome para este plano de ${chatType}:`);
+    if (!planName) return; // User cancelled
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        alert("Você precisa estar logado para salvar um plano.");
+        return;
+      }
+
+      const tableName = chatType === 'treino' ? 'saved_workouts' : 'saved_diets';
+      const nameColumn = chatType === 'treino' ? 'workout_name' : 'diet_name';
+      const contentColumn = chatType === 'treino' ? 'workout_content' : 'diet_content';
+
+      const { error } = await supabase
+        .from(tableName)
+        .insert({
+          user_id: session.user.id,
+          [nameColumn]: planName,
+          [contentColumn]: planContent,
+        });
+
+      if (error) throw error;
+
+      alert(`Plano "${planName}" salvo com sucesso!`);
+    } catch (err: any) {
+      alert(`Falha ao salvar o plano: ${err.message}`);
+    }
+  };
   // Limpar chat no banco
   const handleClearChat = async () => {
     if (!confirm("Tem certeza que deseja limpar o chat?")) return;
@@ -236,7 +266,12 @@ const ChatComponent: React.FC<ChatProps> = ({
                 border: `1px solid ${colors.border}`,
               }}
             >
-              <ReactMarkdown children={msg.text} remarkPlugins={[remarkGfm]} components={markdownComponents} />
+                <ReactMarkdown children={msg.text} remarkPlugins={[remarkGfm]} components={markdownComponents} />
+                {msg.sender === 'ai' && (chatType === 'treino' || chatType === 'dieta') && (
+                    <button onClick={() => handleSavePlan(msg.text)} style={{ marginTop: '1rem', padding: '0.25rem 0.75rem', fontSize: '0.75rem', background: colors.primary, color: isDarkMode ? '#2D0D0D' : 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 'bold' }}>
+                        {chatType === 'treino' ? 'Salvar Treino' : 'Salvar Dieta'}
+                    </button>
+                )}
             </div>
           </div>
         ))}

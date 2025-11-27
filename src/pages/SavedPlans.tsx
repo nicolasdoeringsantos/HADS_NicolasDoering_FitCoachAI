@@ -37,7 +37,6 @@ const SavedPlans: React.FC = () => {
         .select('*')
         .eq('user_id', user.id);
       if (workoutError) throw workoutError;
-      // Ordena os dados no cliente para garantir a consistência do tipo
       setWorkouts(workoutData ? workoutData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : []);
 
       const { data: dietData, error: dietError } = await supabase
@@ -78,11 +77,13 @@ const SavedPlans: React.FC = () => {
       if (error) throw error;
 
       alert("Plano deletado com sucesso!");
-      // Atualiza a lista localmente
       if (type === 'treino') {
         setWorkouts(workouts.filter(w => w.id !== id));
       } else {
         setDiets(diets.filter(d => d.id !== id));
+      }
+      if (selectedPlan && selectedPlan.name === planName) {
+        setSelectedPlan(null);
       }
     } catch (error) {
       console.error("Erro ao deletar plano:", error);
@@ -92,7 +93,7 @@ const SavedPlans: React.FC = () => {
 
   const renderPlanList = (plans: (SavedWorkout | SavedDiet)[], type: 'treino' | 'dieta') => {
     if (plans.length === 0) {
-      return <p className="text-gray-500">Nenhum plano salvo.</p>;
+      return <p className="text-gray-500 dark:text-gray-400">Nenhum plano salvo.</p>;
     }
     return (
       <ul className="space-y-3">
@@ -100,8 +101,8 @@ const SavedPlans: React.FC = () => {
           const name = 'workout_name' in plan ? plan.workout_name : plan.diet_name;
           const content = 'workout_content' in plan ? plan.workout_content : plan.diet_content;
           return (
-            <li key={plan.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex justify-between items-center">
-              <div>
+            <li key={plan.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex justify-between items-center transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+              <div onClick={() => setSelectedPlan({ name, content })} className="cursor-pointer flex-1">
                 <p className="font-semibold text-lg text-gray-800 dark:text-white">{name}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Salvo em: {new Date(plan.created_at).toLocaleDateString()}</p>
               </div>
@@ -117,7 +118,7 @@ const SavedPlans: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center p-10">Carregando planos...</div>;
+    return <div className="text-center p-10 dark:text-white">Carregando planos...</div>;
   }
 
   return (
@@ -139,8 +140,8 @@ const SavedPlans: React.FC = () => {
       </div>
 
       {selectedPlan && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50" onClick={() => setSelectedPlan(null)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
               <h3 className="text-xl font-bold text-gray-800 dark:text-white">{selectedPlan.name}</h3>
               <button onClick={() => setSelectedPlan(null)} className="text-gray-500 hover:text-gray-800 dark:hover:text-white text-2xl">&times;</button>
