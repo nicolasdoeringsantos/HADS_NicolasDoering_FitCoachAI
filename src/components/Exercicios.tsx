@@ -299,34 +299,52 @@ export default function Exercicios() {
       setTimeout(() => setSucessoHorario(""), 2000);
     };
     return (
-      <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: colors.bg, color: colors.text }}>
-        <div style={{ fontSize: 22, color: colors.text, fontWeight: 600, marginBottom: 18 }}>Configurações</div>
-        <form onSubmit={handleHorarioSubmit} style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 280, maxWidth: 340, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-          <label style={{ fontWeight: 500, color: "#23272f", fontSize: 16, marginBottom: 6 }}>
-            Horário para receber mensagem motivacional:
-            <input
-              type="time"
-              value={horarioMotivacional}
-              onChange={e => setHorarioMotivacional(e.target.value)}
-              style={{ marginLeft: 10, padding: 6, borderRadius: 6, border: "1px solid #ccc", fontSize: 15 }}
-              required
-            />
-          </label>
-          <button type="submit" style={{ background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "8px 24px", fontWeight: 600, fontSize: 15, cursor: "pointer" }}>Salvar horário</button>
-          {sucessoHorario && <div style={{ color: "#080", fontSize: 14, marginTop: 4 }}>{sucessoHorario}</div>}
-        </form>
-        {/* Configuração de Modo Noturno */}
-        <form style={{ background: colors.cardBg, borderRadius: 16, boxShadow: "0 2px 8px #bbb", padding: 24, minWidth: 280, maxWidth: 340, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginTop: 24 }}>
-          <label style={{ fontWeight: 500, color: colors.text, fontSize: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
-            Modo Noturno
-            <label style={{ display: 'inline-flex', position: 'relative', cursor: 'pointer' }}>
-              <input type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} style={{ opacity: 0, width: 0, height: 0 }} />
-              <span style={{ width: 42, height: 22, borderRadius: 11, background: isDarkMode ? colors.primary : '#ccc', display: 'block', position: 'relative', transition: 'background 0.2s' }}><span style={{ content: '""', position: 'absolute', top: 2, left: 2, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'transform 0.2s', transform: isDarkMode ? 'translateX(20px)' : 'translateX(0)' }}></span></span>
-            </label>
-          </label>
-        </form>
+      <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: '#4c1d1d', color: '#fff', padding: '2rem' }}>
+        <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '2rem', width: '100%', maxWidth: '500px', boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)' }}>
+          <h1 style={{ fontSize: '1.75rem', color: '#FFD600', textAlign: 'center', marginBottom: '2rem' }}>Configurações</h1>
+          
+          {/* Seção de Aparência */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#FFD600', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Aparência</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
+              <label htmlFor="darkModeToggle" style={{ fontWeight: 500, fontSize: '1rem' }}>Modo Noturno</label>
+              <label style={{ display: 'inline-flex', position: 'relative', cursor: 'pointer' }}>
+                <input id="darkModeToggle" type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} style={{ opacity: 0, width: 0, height: 0 }} />
+                <span style={{ width: 42, height: 22, borderRadius: 11, background: isDarkMode ? '#FFD600' : '#ccc', display: 'block', position: 'relative', transition: 'background 0.2s' }}>
+                  <span style={{ content: '""', position: 'absolute', top: 2, left: 2, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'transform 0.2s', transform: isDarkMode ? 'translateX(20px)' : 'translateX(0)' }}></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Seção de Notificações */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#FFD600', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Notificações</h2>
+            <form onSubmit={handleHorarioSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="motivacionalTime" style={{ fontWeight: 500, fontSize: '1rem' }}>Mensagem Motivacional</label>
+                <input id="motivacionalTime" type="time" value={horarioMotivacional} onChange={e => setHorarioMotivacional(e.target.value)} style={{ padding: '0.25rem 0.5rem', borderRadius: 6, border: '1px solid #444', background: '#333', color: '#fff' }} required />
+              </div>
+              {/* Adicione mais opções de notificação aqui se desejar */}
+              <button type="submit" style={{ background: '#FFD600', color: '#B71C1C', border: 0, borderRadius: 8, padding: '0.5rem 1rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', alignSelf: 'flex-end' }}>Salvar Horários</button>
+              {sucessoHorario && <div style={{ color: '#90EE90', fontSize: '0.875rem', textAlign: 'right' }}>{sucessoHorario}</div>}
+            </form>
+          </div>
+
+          {/* Zona de Perigo */}
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#ef4444', borderBottom: '1px solid rgba(255,100,100,0.2)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Zona de Perigo</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <p style={{ margin: 0, color: '#ddd' }}>Apagar sua conta permanentemente.</p>
+              <button onClick={() => alert('Funcionalidade de deletar conta a ser implementada.')} style={{ background: '#B71C1C', color: 'white', border: '1px solid #ef4444', borderRadius: 8, padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}>
+                Deletar Conta
+              </button>
+            </div>
+          </div>
+        </div>
+
         <button
-          style={{ marginTop: 32, background: "#23272f", color: "#fff", border: 0, borderRadius: 8, padding: "10px 32px", fontWeight: 600, fontSize: 16, cursor: "pointer" }}
+          style={{ marginTop: '2rem', background: 'transparent', color: '#FFD600', border: '1px solid #FFD600', borderRadius: '50px', padding: '0.75rem 2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer' }}
           onClick={() => setConfigPage(false)}
         >
           Voltar

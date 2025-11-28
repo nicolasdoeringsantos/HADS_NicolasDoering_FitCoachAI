@@ -23,6 +23,7 @@ const SavedPlans: React.FC = () => {
   const [diets, setDiets] = useState<SavedDiet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<{ name: string; content: string } | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   const fetchPlans = useCallback(async () => {
@@ -93,7 +94,10 @@ const SavedPlans: React.FC = () => {
 
   const renderPlanList = (plans: (SavedWorkout | SavedDiet)[], type: 'treino' | 'dieta') => {
     if (plans.length === 0) {
-      return <p className="text-gray-500 dark:text-gray-400">Nenhum plano salvo.</p>;
+      if (searchTerm) {
+        return <p style={{ color: '#ddd' }}>Nenhum plano encontrado para "{searchTerm}".</p>;
+      }
+      return <p style={{ color: '#ddd' }}>Nenhum plano salvo nesta categoria.</p>;
     }
     return (
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -130,6 +134,14 @@ const SavedPlans: React.FC = () => {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#4c1d1d', color: 'white' }}>Carregando planos...</div>;
   }
 
+  const filteredWorkouts = workouts.filter(workout =>
+    workout.workout_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredDiets = diets.filter(diet =>
+    diet.diet_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ minHeight: '100vh', background: '#4c1d1d', color: 'white', padding: '2rem', boxSizing: 'border-box' }}>
       <button onClick={() => navigate(-1)} style={{ marginBottom: '2rem', background: '#FFD600', color: '#B71C1C', border: 'none', borderRadius: '50px', padding: '0.75rem 2rem', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 14px 0 rgba(0,0,0,0.2)' }}>
@@ -137,8 +149,19 @@ const SavedPlans: React.FC = () => {
       </button>
       <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', color: '#FFD600', textShadow: '1px 1px 4px rgba(0,0,0,0.5)', marginBottom: '2rem', textAlign: 'center' }}>Meus Planos Salvos</h1>
 
+      {/* Campo de Busca */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto 2rem auto', display: 'flex', justifyContent: 'center' }}>
+        <input
+          type="text"
+          placeholder="Buscar por nome do plano..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: '100%', maxWidth: '600px', padding: '0.75rem 1.5rem', borderRadius: '50px', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', fontSize: '1rem' }}
+        />
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        {workouts.length === 0 && diets.length === 0 ? (
+        {workouts.length === 0 && diets.length === 0 && !searchTerm ? (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', background: 'rgba(0,0,0,0.2)', borderRadius: '16px' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#FFD600' }}>Você ainda não tem planos salvos.</h2>
             <p style={{ marginTop: '0.5rem', color: '#ddd' }}>
@@ -149,11 +172,11 @@ const SavedPlans: React.FC = () => {
           <>
             <div>
               <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#FFD600' }}>🏋️ Planos de Treino</h2>
-              {renderPlanList(workouts, 'treino')}
+              {renderPlanList(filteredWorkouts, 'treino')}
             </div>
             <div>
               <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#FFD600' }}>🍎 Planos de Dieta</h2>
-              {renderPlanList(diets, 'dieta')}
+              {renderPlanList(filteredDiets, 'dieta')}
             </div>
           </>
         )}
