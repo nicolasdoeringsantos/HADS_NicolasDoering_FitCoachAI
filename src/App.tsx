@@ -9,6 +9,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 import ExercicioDetalhe from "./pages/ExercicioDetalhe";
 import MensagemMotivacional from "./pages/MensagemMotivacional";
 import ChatPage from "./pages/ChatPage";
+import SavedPlans from "./pages/SavedPlans";
 
 
 // Components
@@ -31,6 +32,7 @@ function App() {
         <Route path="/motivacional" element={<MensagemMotivacional />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/chat-alimentacao" element={<AlimentacaoChatPage />} />
+        <Route path="/meus-planos" element={<SavedPlans />} />
       </Routes>
     </div>
   );

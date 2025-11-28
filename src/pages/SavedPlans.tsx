@@ -96,19 +96,28 @@ const SavedPlans: React.FC = () => {
       return <p className="text-gray-500 dark:text-gray-400">Nenhum plano salvo.</p>;
     }
     return (
-      <ul className="space-y-3">
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {plans.map(plan => {
           const name = 'workout_name' in plan ? plan.workout_name : plan.diet_name;
           const content = 'workout_content' in plan ? plan.workout_content : plan.diet_content;
           return (
-            <li key={plan.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex justify-between items-center transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700">
-              <div onClick={() => setSelectedPlan({ name, content })} className="cursor-pointer flex-1">
-                <p className="font-semibold text-lg text-gray-800 dark:text-white">{name}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Salvo em: {new Date(plan.created_at).toLocaleDateString()}</p>
+            <li key={plan.id} style={{
+              background: 'rgba(0, 0, 0, 0.25)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '16px',
+              padding: '1.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              transition: 'background 0.2s ease',
+            }}>
+              <div onClick={() => setSelectedPlan({ name, content })} style={{ cursor: 'pointer', flex: 1 }}>
+                <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#FFD600' }}>{name}</p>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd', fontSize: '0.9rem' }}>Salvo em: {new Date(plan.created_at).toLocaleDateString()}</p>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => setSelectedPlan({ name, content })} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-sm">Visualizar</button>
-                <button onClick={() => handleDelete(plan.id, type)} className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded text-sm">Deletar</button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button onClick={() => setSelectedPlan({ name, content })} style={{ background: '#FFD600', color: '#B71C1C', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 'bold' }}>Visualizar</button>
+                <button onClick={() => handleDelete(plan.id, type)} style={{ background: '#B71C1C', color: 'white', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', cursor: 'pointer' }}>Deletar</button>
               </div>
             </li>
           );
@@ -118,35 +127,46 @@ const SavedPlans: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center p-10 dark:text-white">Carregando planos...</div>;
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#4c1d1d', color: 'white' }}>Carregando planos...</div>;
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <button onClick={() => navigate(-1)} className="mb-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+    <div style={{ minHeight: '100vh', background: '#4c1d1d', color: 'white', padding: '2rem', boxSizing: 'border-box' }}>
+      <button onClick={() => navigate(-1)} style={{ marginBottom: '2rem', background: '#FFD600', color: '#B71C1C', border: 'none', borderRadius: '50px', padding: '0.75rem 2rem', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 14px 0 rgba(0,0,0,0.2)' }}>
         &larr; Voltar
       </button>
-      <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">Meus Planos Salvos</h1>
+      <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', color: '#FFD600', textShadow: '1px 1px 4px rgba(0,0,0,0.5)', marginBottom: '2rem', textAlign: 'center' }}>Meus Planos Salvos</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">🏋️ Planos de Treino</h2>
-          {renderPlanList(workouts, 'treino')}
-        </div>
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">🍎 Planos de Dieta</h2>
-          {renderPlanList(diets, 'dieta')}
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        {workouts.length === 0 && diets.length === 0 ? (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', background: 'rgba(0,0,0,0.2)', borderRadius: '16px' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#FFD600' }}>Você ainda não tem planos salvos.</h2>
+            <p style={{ marginTop: '0.5rem', color: '#ddd' }}>
+              Vá para a tela de chat para criar seu primeiro plano de treino ou dieta com nossos especialistas de IA!
+            </p>
+          </div>
+        ) : (
+          <>
+            <div>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#FFD600' }}>🏋️ Planos de Treino</h2>
+              {renderPlanList(workouts, 'treino')}
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#FFD600' }}>🍎 Planos de Dieta</h2>
+              {renderPlanList(diets, 'dieta')}
+            </div>
+          </>
+        )}
       </div>
 
       {selectedPlan && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50" onClick={() => setSelectedPlan(null)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white">{selectedPlan.name}</h3>
-              <button onClick={() => setSelectedPlan(null)} className="text-gray-500 hover:text-gray-800 dark:hover:text-white text-2xl">&times;</button>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', zIndex: 50 }} onClick={() => setSelectedPlan(null)}>
+          <div style={{ background: '#2D0D0D', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '16px', boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)', maxWidth: '800px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#FFD600' }}>{selectedPlan.name}</h3>
+              <button onClick={() => setSelectedPlan(null)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
             </div>
-            <div className="p-6 overflow-y-auto prose dark:prose-invert max-w-none">
+            <div style={{ padding: '1.5rem', overflowY: 'auto' }}>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{selectedPlan.content}</ReactMarkdown>
             </div>
           </div>

@@ -513,7 +513,7 @@ export default function Exercicios() {
 
             {/* Card de Treinos Salvos */}
             <div
-              onClick={() => navigate(`/meus-treinos`)}
+              onClick={() => navigate(`/meus-planos`)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '16px', cursor: 'pointer',
                 transition: 'transform 0.2s ease, background 0.2s ease', minWidth: '350px'
@@ -523,8 +523,8 @@ export default function Exercicios() {
             >
               <span style={{ fontSize: '2.5rem' }}>📂</span>
               <div>
-                <h3 style={{ margin: 0, color: '#FFD600' }}>Meus Treinos</h3>
-                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Acesse seus treinos salvos.</p>
+                <h3 style={{ margin: 0, color: '#FFD600' }}>Meus Planos</h3>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#ddd' }}>Acesse seus treinos e dietas.</p>
               </div>
             </div>
         </div>
