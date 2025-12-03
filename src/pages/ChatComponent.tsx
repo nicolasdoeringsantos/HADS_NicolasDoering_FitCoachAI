@@ -33,10 +33,15 @@ const tableMap = {
 // Busca histórico salvo no banco Supabase
 const fetchDbHistory = async (chatType: "treino" | "dieta") => {
   const table = tableMap[chatType];
+  
+  // Garante que o usuário está logado antes de buscar
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return [];
 
   const { data, error } = await supabase
     .from(table)
     .select("role, message")
+    .eq("user_id", session.user.id) // <-- ADICIONE ESTA LINHA
     .order("created_at", { ascending: true });
 
   if (error) {
@@ -78,9 +83,8 @@ const ChatComponent: React.FC<ChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const isDarkMode = location.pathname.includes("treino");
+  const navigate = useNavigate();  
+  const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
 
   // Carregar histórico do banco
   useEffect(() => {
@@ -102,6 +106,20 @@ const ChatComponent: React.FC<ChatProps> = ({
     };
     loadHistory();
   }, [chatType, initialMessage]);
+
+  // Efeito para ouvir mudanças de tema em tempo real
+  useEffect(() => {
+    const handleThemeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ isDarkMode: boolean }>;
+      setIsDarkMode(customEvent.detail.isDarkMode);
+    };
+
+    window.addEventListener('theme-changed', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('theme-changed', handleThemeChange);
+    };
+  }, []);
 
   // Enviar mensagens
   const handleSend = useCallback(async () => {
@@ -227,6 +245,8 @@ const ChatComponent: React.FC<ChatProps> = ({
         ul: (props: MarkdownProps) => <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', margin: '0.5rem 0' }} {...props} />,
         ol: (props: MarkdownProps) => <ol style={{ listStyleType: 'decimal', paddingLeft: '1.5rem', margin: '0.5rem 0' }} {...props} />,
         li: (props: MarkdownProps) => <li style={{ marginBottom: '0.25rem' }} {...props} />,
+        // Garante que todos os links abram em uma nova aba
+        a: (props: MarkdownProps) => <a target="_blank" rel="noopener noreferrer" {...props} style={{ color: isDarkMode ? '#FFD600' : '#16a34a', textDecoration: 'underline' }} />,
         p: (props: MarkdownProps) => <p style={{ margin: 0 }} {...props} />,
     }), []);
 
