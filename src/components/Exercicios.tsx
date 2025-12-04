@@ -1,78 +1,83 @@
-
-
+// Importa as dependências necessárias do React e do React Router.
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+// Importa o cliente Supabase para interagir com o banco de dados.
 import { supabase } from "../pages/supabaseClient";
 
-// Simulação de dados de exercícios
-const mockExercicios = [
-  {
-    id: 1,
-    titulo: "Exercício",
-    descricao: "Exemplo de exercício",
-    imagem: "exerc.png"
-  }
-];
 // Componente principal Exercicios
 export default function Exercicios() {
-  // Estado para horário de mensagem motivacional
-  const [horarioMotivacional, setHorarioMotivacional] = useState("08:00");
-  const [sucessoHorario, setSucessoHorario] = useState("");
+  // Hook para navegação entre páginas.
   const navigate = useNavigate();
-  // Estados globais do componente
-  const [perfilPage, setPerfilPage] = useState(false);
-  const [configPage, setConfigPage] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Estados do formulário de perfil
+  // --- Estados de Controle da Interface ---
+  // Controla a visibilidade da página de perfil.
+  const [perfilPage, setPerfilPage] = useState(false);
+  // Controla a visibilidade da página de configurações.
+  const [configPage, setConfigPage] = useState(false);
+  // Controla se o menu hambúrguer está aberto ou fechado.
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Indica se alguma operação (como carregar dados) está em andamento.
+  const [loading, setLoading] = useState(false);
+  // Controla o tema da aplicação (claro ou escuro).
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Estado para o horário da mensagem motivacional (página de configurações).
+  const [horarioMotivacional, setHorarioMotivacional] = useState("08:00");
+  // Mensagem de sucesso ao salvar o horário.
+  const [sucessoHorario, setSucessoHorario] = useState("");
+
+  // --- Estados do Formulário de Perfil e Dieta ---
+  // Dados gerais do usuário.
   const [nome, setNome] = useState("");
   const [apelido, setApelido] = useState("");
   const [idade, setIdade] = useState("");
   const [sexo, setSexo] = useState("");
   const [altura, setAltura] = useState("");
   const [peso, setPeso] = useState("");
+  // Dados relacionados ao treino.
   const [nivel, setNivel] = useState("");
   const [experiencia, setExperiencia] = useState("");
   const [objetivo, setObjetivo] = useState("");
   const [restricao, setRestricao] = useState("");
-  // Estados do formulário de dieta
+  // Dados relacionados à dieta.
   const [alergias, setAlergias] = useState("");
   const [intolerancias, setIntolerancias] = useState("");
   const [comidasNaoGosta, setComidasNaoGosta] = useState("");
   const [tipoDieta, setTipoDieta] = useState("");
   const [refeicoesPorDia, setRefeicoesPorDia] = useState("");
 
-  // Estados do formulário de senha
+  // --- Estados de Feedback e Formulário de Senha ---
+  // Mensagens de erro e sucesso para o formulário de perfil/treino.
+  const [erroTreino, setErroTreino] = useState("");
+  const [sucessoTreino, setSucessoTreino] = useState("");
+  // Campos e mensagens para o formulário de alteração de senha.
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [erroTreino, setErroTreino] = useState("");
-  const [sucessoTreino, setSucessoTreino] = useState("");
   const [erroSenha, setErroSenha] = useState("");
   const [sucessoSenha, setSucessoSenha] = useState("");
-  const [erroDieta, setErroDieta] = useState("");
-  const [sucessoDieta, setSucessoDieta] = useState("");
 
   // Funções de submit
   const handleSubmitPerfil = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroTreino("");
     setSucessoTreino("");
+    // Validação simples para campos obrigatórios.
     if (!nome || !idade || !sexo || !altura || !peso) {
       setErroTreino("Preencha todos os campos obrigatórios.");
       return;
     }
 
     try {
+      // Obtém o usuário autenticado.
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não encontrado");
 
+      // 'upsert' insere um novo registro se não houver correspondência com o ID,
+      // ou atualiza o registro existente se houver.
       const { error } = await supabase
         .from('Users_data')
         .upsert({
-          id: user.id, // Garante que o ID do usuário seja inserido ou usado para a correspondência
+          id: user.id, // Chave primária para garantir a atualização do usuário correto.
           nome,
           apelido,
           idade: parseInt(idade) || null,
@@ -91,33 +96,37 @@ export default function Exercicios() {
         });
 
       if (error) {
+        // Se o Supabase retornar um erro, ele é lançado para o bloco catch.
         throw error;
       }
 
+      // Define mensagens de sucesso.
       setSucessoTreino("Dados salvos! Pronto para criar seu treino.");
-      setSucessoDieta("Dados de dieta salvos com sucesso!");
     } catch (error: any) {
+      // Captura e exibe qualquer erro que ocorra durante o processo.
       setErroTreino(error.message || "Erro ao salvar os dados.");
-      setErroDieta(error.message || "Erro ao salvar os dados da dieta.");
     }
   };
 
-  // Carregar dados do usuário ao abrir a página de perfil
+  // Efeito para carregar os dados do usuário quando a página de perfil é aberta.
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       try {
+        // Pega o usuário logado.
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("Usuário não autenticado.");
 
+        // Busca os dados do perfil do usuário na tabela 'Users_data'.
         const { data, error } = await supabase
           .from('Users_data')
           .select('*')
           .eq('id', user.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') throw error; // Ignora erro se o perfil ainda não existe
+        if (error && error.code !== 'PGRST116') throw error; // Ignora o erro 'PGRST116', que significa "nenhum resultado encontrado".
 
+        // Se os dados forem encontrados, preenche os campos do formulário.
         if (data) {
           setNome(data.nome || "");
           setApelido(data.apelido || "");
@@ -141,15 +150,17 @@ export default function Exercicios() {
         setLoading(false);
       }
     };
+    // A busca só é executada se a página de perfil estiver ativa.
     if (perfilPage) fetchUserData();
   }, [perfilPage]);
 
-  // Efeito para carregar e aplicar o modo noturno
+  // Efeito para carregar o modo escuro salvo no localStorage ao iniciar o componente.
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(savedMode);
   }, []);
 
+  // Efeito para aplicar o estilo do modo escuro e salvá-lo no localStorage sempre que ele mudar.
   useEffect(() => {
     localStorage.setItem('darkMode', String(isDarkMode));
     if (isDarkMode) {
@@ -159,6 +170,7 @@ export default function Exercicios() {
     }
   }, [isDarkMode]);
 
+  // Função para lidar com a alteração de senha.
   const handleSubmitSenha = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroSenha("");
@@ -175,8 +187,7 @@ export default function Exercicios() {
       setErroSenha("A nova senha deve ter pelo menos 6 caracteres.");
       return;
     }
-    // TODO: Adicionar validação da senha atual se necessário, o que exigiria um backend seguro.
-    // A API do Supabase auth.updateUser não verifica a senha antiga por segurança.
+    // A API `updateUser` do Supabase não exige a senha antiga por segurança, pois a operação já requer um token de sessão válido.
     try {
       const { error } = await supabase.auth.updateUser({ password: novaSenha });
       if (error) {
@@ -192,11 +203,13 @@ export default function Exercicios() {
     }
   };
 
+  // Função para fazer logout do usuário.
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    navigate("/"); // Redireciona para a página de login.
   };
 
+  // Objeto de cores para facilitar a aplicação do tema claro/escuro.
   const colors = {
     bg: isDarkMode ? '#1a1a1a' : '#f2f4f8',
     cardBg: isDarkMode ? '#2c2c2c' : '#fff',
@@ -210,8 +223,10 @@ export default function Exercicios() {
     primary: '#22c55e',
   };
 
+  // --- Renderização Condicional ---
+  // Se `perfilPage` for true, renderiza a página de perfil.
   if (perfilPage) {
-    return ( // O código da página de perfil permanece o mesmo, mas é bom notar que o fundo aqui também mudará.
+    return (
       <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: colors.bg, color: colors.text }}>
         <button 
           style={{ marginBottom: 18, background: "#23272f", color: "#fff", border: 0, borderRadius: 6, padding: "6px 18px", cursor: "pointer" }} 
@@ -292,8 +307,9 @@ export default function Exercicios() {
     );
   }
 
+  // Se `configPage` for true, renderiza a página de configurações.
   if (configPage) {
-    const handleHorarioSubmit = (e: React.FormEvent) => { // O código da página de configurações também permanece o mesmo.
+    const handleHorarioSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       setSucessoHorario("Horário salvo com sucesso!");
       setTimeout(() => setSucessoHorario(""), 2000);
@@ -353,6 +369,7 @@ export default function Exercicios() {
     );
   }
 
+  // Renderização padrão: o painel principal (dashboard).
   return (
     <div style={{ 
       minHeight: "100vh", 
@@ -364,7 +381,7 @@ export default function Exercicios() {
       flexDirection: "column", 
       alignItems: "center", 
       justifyContent: "flex-start" }}>
-      {/* Menu Hambúrguer */}
+      {/* Cabeçalho com o botão de menu hambúrguer */}
       <header
         style={{
           position: "fixed",
@@ -389,6 +406,7 @@ export default function Exercicios() {
         <span style={{ fontWeight: 600, fontSize: 20, color: '#FFD600' }}>FitCoachAI</span>
         <div style={{ width: 32 }} />
       </header>
+      {/* Menu lateral que abre ao clicar no botão hambúrguer */}
       {menuOpen && (
         <div style={{
           position: "fixed",
@@ -431,13 +449,13 @@ export default function Exercicios() {
         </div>
       )}
 
-      {/* Feedback visual */}
+      {/* Indicador de carregamento */}
       {loading && (
         <div style={{ position: "fixed", top: 70, left: 0, width: "100vw", textAlign: "center", zIndex: 300 }}>
           <span style={{ background: "#fff", color: "#23272f", padding: "8px 24px", borderRadius: 8, boxShadow: "0 2px 8px #bbb", fontWeight: 500 }}>Carregando...</span>
         </div>
       )}
-      {/* Cards de exercícios simulados + perfil + mensagem motivacional */}
+      {/* Conteúdo principal do dashboard */}
       <div style={{
           display: 'flex',
           flexDirection: 'row',
@@ -451,7 +469,7 @@ export default function Exercicios() {
           flexWrap: 'wrap',
           boxSizing: 'border-box'
       }}>
-        {/* Seção de Descrição */}
+        {/* Seção de texto de boas-vindas */}
         <div style={{ maxWidth: '450px', textAlign: 'left', animation: "fadeIn 0.8s" }}>
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', color: '#FFD600', textShadow: '1px 1px 4px rgba(0,0,0,0.5)', margin: '0 0 1rem 0' }}>Sua Jornada Começa Agora</h1>
           <p style={{ fontSize: '1.1rem', lineHeight: 1.6, color: '#f0f0f0' }}>
@@ -459,7 +477,7 @@ export default function Exercicios() {
           </p>
         </div>
 
-        {/* Seção de Ferramentas */}
+        {/* Seção de cartões de navegação (ferramentas) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: "fadeIn 0.8s 0.2s backwards" }}>
             {/* Card de Treino */}
             <div
@@ -547,7 +565,7 @@ export default function Exercicios() {
             </div>
         </div>
       </div>
-      {/* Animações CSS */}
+      {/* Estilos CSS embutidos para as animações */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }
